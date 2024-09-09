@@ -3,64 +3,138 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>¡Feliz Cumpleaños!</title>
+    <title>¡Feliz Cumpleaños Roxy!</title>
     <style>
         body {
             display: flex;
-            justify-content: center;
+            flex-direction: column;
+            justify-content: flex-start;
             align-items: center;
             height: 100vh;
-            background-color: #f0e6f6;
+            background-color: #000;
             font-family: 'Arial', sans-serif;
             text-align: center;
+            color: #ffffff;
             margin: 0;
+            overflow: hidden;
         }
+
+        h1 {
+            font-size: 3em;
+            color: #ffffff;
+            margin-top: 20px;
+            animation: fadeIn 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0.5; }
+            to { opacity: 1; }
+        }
+
+        .cake-container {
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            margin-top: 150px;
+        }
+
         .cake {
             position: relative;
-            width: 200px;
-            height: 200px;
-            background-color: pink;
+            width: 250px;
+            height: 180px;
+            background: linear-gradient(45deg, pink, lightblue);
             border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.2);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
+
         .candle {
             position: absolute;
-            top: -30px;
-            left: calc(50% - 5px);
-            width: 10px;
-            height: 50px;
+            top: -60px;
+            width: 20px;
+            height: 100px;
             background-color: #FFD700;
+            border-radius: 5px;
         }
+
         .flame {
             position: absolute;
-            top: -15px;
+            top: -30px;
             left: 50%;
             transform: translateX(-50%);
             width: 20px;
-            height: 20px;
-            background-color: orange;
+            height: 30px;
+            background: radial-gradient(circle at 50% 50%, orange, red, yellow);
             border-radius: 50%;
-            box-shadow: 0 0 20px orange;
-            animation: flicker 0.1s infinite alternate;
+            box-shadow: 0 0 30px 10px orange;
+            animation: flicker 0.3s infinite alternate;
         }
+
         @keyframes flicker {
             from { opacity: 1; transform: translateX(-50%) scale(1); }
             to { opacity: 0.6; transform: translateX(-50%) scale(1.1); }
         }
+
         .flame.off {
-            display: none;
+            animation: extinguish 1s forwards;
+        }
+
+        @keyframes extinguish {
+            0% { opacity: 1; transform: scale(1); }
+            100% { opacity: 0; transform: scale(0); }
+        }
+
+        .smoke {
+            position: absolute;
+            top: -70px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 40px;
+            height: 40px;
+            background-color: transparent;
+            border-radius: 50%;
+            box-shadow: 0 0 30px rgba(255, 255, 255, 0.5);
+            animation: smoke 3s ease-out infinite;
+            opacity: 0;
+        }
+
+        @keyframes smoke {
+            0% { opacity: 1; transform: translateY(0) scale(1); }
+            100% { opacity: 0; transform: translateY(-50px) scale(2); }
+        }
+
+        iframe {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            border: 0;
         }
     </style>
 </head>
 <body>
-    <div class="cake">
-        <div class="candle">
-            <div class="flame" id="flame"></div>
+    <h1>¡Feliz cumple Roxy, te amoooo!</h1>
+
+    <div class="cake-container">
+        <div class="cake">
+            <div class="candle">
+                <div class="flame" id="flame"></div>
+                <div class="smoke" id="smoke"></div>
+            </div>
         </div>
     </div>
 
+    <!-- Audio de fondo -->
+    <audio autoplay loop>
+        <source src="videoplayback.mp3" type="audio/mp3">
+        Tu navegador no soporta la etiqueta de audio.
+    </audio>
+
     <script>
-        // Solicitar acceso al micrófono
+        // Solicitar acceso al micrófono para apagar la vela
         navigator.mediaDevices.getUserMedia({ audio: true })
         .then(function(stream) {
             const audioContext = new (window.AudioContext || window.webkitAudioContext)();
@@ -73,11 +147,12 @@
             function detectSound() {
                 analyser.getByteFrequencyData(dataArray);
                 let volume = dataArray.reduce((a, b) => a + b) / dataArray.length;
-                
-                if (volume > 20) { // Ajusta este valor según la sensibilidad deseada
+
+                if (volume > 150) { // Ajusta este valor según la sensibilidad deseada
                     document.getElementById('flame').classList.add('off'); // Apaga la llama
+                    document.getElementById('smoke').style.opacity = '1'; // Humo visible
                 }
-                
+
                 requestAnimationFrame(detectSound);
             }
 
@@ -87,5 +162,11 @@
             console.error('Error al acceder al micrófono:', err);
         });
     </script>
+   <!-- Audio de fondo sin controles -->
+<audio autoplay loop>
+    <source src="videoplayback.mp3" type="audio/mp3">
+    Tu navegador no soporta la etiqueta de audio.
+</audio>
+
 </body>
 </html>
