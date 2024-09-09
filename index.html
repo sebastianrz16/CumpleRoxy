@@ -148,7 +148,7 @@
                 analyser.getByteFrequencyData(dataArray);
                 let volume = dataArray.reduce((a, b) => a + b) / dataArray.length;
 
-                if (volume > 150) { // Ajusta este valor según la sensibilidad deseada
+                if (volume > 100) { // Ajusta este valor según la sensibilidad deseada
                     document.getElementById('flame').classList.add('off'); // Apaga la llama
                     document.getElementById('smoke').style.opacity = '1'; // Humo visible
                 }
