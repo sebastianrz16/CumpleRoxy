@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>¡Feliz Cumpleaños!</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0e6f6;
+            font-family: 'Arial', sans-serif;
+            text-align: center;
+            margin: 0;
+        }
+        .cake {
+            position: relative;
+            width: 200px;
+            height: 200px;
+            background-color: pink;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.2);
+        }
+        .candle {
+            position: absolute;
+            top: -30px;
+            left: calc(50% - 5px);
+            width: 10px;
+            height: 50px;
+            background-color: #FFD700;
+        }
+        .flame {
+            position: absolute;
+            top: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 20px;
+            height: 20px;
+            background-color: orange;
+            border-radius: 50%;
+            box-shadow: 0 0 20px orange;
+            animation: flicker 0.1s infinite alternate;
+        }
+        @keyframes flicker {
+            from { opacity: 1; transform: translateX(-50%) scale(1); }
+            to { opacity: 0.6; transform: translateX(-50%) scale(1.1); }
+        }
+        .flame.off {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="cake">
+        <div class="candle">
+            <div class="flame" id="flame"></div>
+        </div>
+    </div>
+
+    <script>
+        // Solicitar acceso al micrófono
+        navigator.mediaDevices.getUserMedia({ audio: true })
+        .then(function(stream) {
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const microphone = audioContext.createMediaStreamSource(stream);
+            const analyser = audioContext.createAnalyser();
+            analyser.fftSize = 256;
+            const dataArray = new Uint8Array(analyser.frequencyBinCount);
+            microphone.connect(analyser);
+
+            function detectSound() {
+                analyser.getByteFrequencyData(dataArray);
+                let volume = dataArray.reduce((a, b) => a + b) / dataArray.length;
+                
+                if (volume > 20) { // Ajusta este valor según la sensibilidad deseada
+                    document.getElementById('flame').classList.add('off'); // Apaga la llama
+                }
+                
+                requestAnimationFrame(detectSound);
+            }
+
+            detectSound();
+        })
+        .catch(function(err) {
+            console.error('Error al acceder al micrófono:', err);
+        });
+    </script>
+</body>
+</html>
