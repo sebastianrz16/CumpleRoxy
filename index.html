@@ -265,11 +265,33 @@
 
         createStars();
 
-        // Apagar vela
-        document.getElementById('flame').addEventListener('click', function() {
-            this.classList.add('off');
-            document.getElementById('smoke').style.opacity = 1;
-            launchConfetti();
+        // Solicitar acceso al micrófono para apagar la vela
+        navigator.mediaDevices.getUserMedia({ audio: true })
+        .then(function(stream) {
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const microphone = audioContext.createMediaStreamSource(stream);
+            const analyser = audioContext.createAnalyser();
+            analyser.fftSize = 256;
+            const dataArray = new Uint8Array(analyser.frequencyBinCount);
+            microphone.connect(analyser);
+
+            function detectSound() {
+                analyser.getByteFrequencyData(dataArray);
+                let volume = dataArray.reduce((a, b) => a + b) / dataArray.length;
+
+                if (volume > 100) { // Ajusta este valor según la sensibilidad deseada
+                    document.getElementById('flame').classList.add('off'); // Apaga la llama
+                    document.getElementById('smoke').style.opacity = '1'; // Humo visible
+                    launchConfetti(); // Lanzar confeti
+                }
+
+                requestAnimationFrame(detectSound);
+            }
+
+            detectSound();
+        })
+        .catch(function(err) {
+            console.error('Error al acceder al micrófono:', err);
         });
     </script>
 </body>
