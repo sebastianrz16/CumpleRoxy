@@ -38,6 +38,12 @@
             align-items: center;
             flex-direction: column;
             margin-top: 120px;
+            animation: bounce 2s ease-in-out infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
         }
 
         .cake {
@@ -53,7 +59,6 @@
             flex-direction: column;
         }
 
-        /* Detalle de las capas del pastel */
         .cake-layer {
             width: 100%;
             height: 30px;
@@ -145,18 +150,12 @@
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
         }
 
-        /* Mover la imagen de la "rata" a la derecha */
-        .image-container img:nth-child(2) {
+        /* Mover la imagen de la rata hacia la izquierda */
+        .rata {
             position: absolute;
-            right: 20px;
-            bottom: 50px;
-        }
-
-        iframe {
-            position: absolute;
-            width: 1px;
-            height: 1px;
-            border: 0;
+            left: 5%;
+            top: 40%;
+            transform: translateY(-50%);
         }
 
         /* Confeti */
@@ -180,9 +179,35 @@
         .confetti:nth-child(3n) { background-color: green; }
         .confetti:nth-child(4n) { background-color: blue; }
         .confetti:nth-child(5n) { background-color: purple; }
+
+        /* Fondo de estrellas */
+        .stars {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at center, rgba(255,255,255,0.1), rgba(0,0,0,0.1));
+            overflow: hidden;
+        }
+
+        .stars div {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background-color: white;
+            animation: twinkling 5s infinite ease-in-out;
+        }
+
+        @keyframes twinkling {
+            from { opacity: 0.2; transform: scale(1); }
+            to { opacity: 1; transform: scale(1.5); }
+        }
     </style>
 </head>
 <body>
+    <div class="stars" id="stars"></div>
+
     <h1>¡Feliz cumple Roxy, te amoooo!</h1>
 
     <div class="cake-container">
@@ -205,7 +230,7 @@
     <!-- Añadir imágenes alrededor del pastel -->
     <div class="image-container">
         <img src="gaturros.jpg" alt="Gaturros" />
-        <img src="rata.jpg" alt="Rata" /> <!-- Imagen reposicionada -->
+        <img src="rata.jpg" alt="Rata" class="rata" /> <!-- Imagen reposicionada a la izquierda -->
         <img src="rata2.jpg" alt="Rata2" />
     </div>
 
@@ -227,33 +252,24 @@
             }
         }
 
-        // Solicitar acceso al micrófono para apagar la vela
-        navigator.mediaDevices.getUserMedia({ audio: true })
-        .then(function(stream) {
-            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-            const microphone = audioContext.createMediaStreamSource(stream);
-            const analyser = audioContext.createAnalyser();
-            analyser.fftSize = 256;
-            const dataArray = new Uint8Array(analyser.frequencyBinCount);
-            microphone.connect(analyser);
-
-            function detectSound() {
-                analyser.getByteFrequencyData(dataArray);
-                let volume = dataArray.reduce((a, b) => a + b) / dataArray.length;
-
-                if (volume > 100) { // Ajusta este valor según la sensibilidad deseada
-                    document.getElementById('flame').classList.add('off'); // Apaga la llama
-                    document.getElementById('smoke').style.opacity = '1'; // Humo visible
-                    launchConfetti(); // Lanzar confeti
-                }
-
-                requestAnimationFrame(detectSound);
+        // Función para crear estrellas de fondo
+        function createStars() {
+            const starsContainer = document.getElementById('stars');
+            for (let i = 0; i < 50; i++) {
+                let star = document.createElement('div');
+                star.style.top = `${Math.random() * 100}vh`;
+                star.style.left = `${Math.random() * 100}vw`;
+                starsContainer.appendChild(star);
             }
+        }
 
-            detectSound();
-        })
-        .catch(function(err) {
-            console.error('Error al acceder al micrófono:', err);
+        createStars();
+
+        // Apagar vela
+        document.getElementById('flame').addEventListener('click', function() {
+            this.classList.add('off');
+            document.getElementById('smoke').style.opacity = 1;
+            launchConfetti();
         });
     </script>
 </body>
